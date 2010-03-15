@@ -6,8 +6,8 @@ module HasHandleFallback
   RECORD_ID_REGEXP = /\A\d+\z/
   
   def self.str2handle(str)
-    str = str.gsub ANTI_REGEXP, ''
-    str << ('_' * LENGTH_RANGE.min - str.length) unless LENGTH_RANGE.include?(str.length)
+    str = str.to_s.gsub ANTI_REGEXP, ''
+    str << ('_' * (LENGTH_RANGE.min - str.length)) unless LENGTH_RANGE.include?(str.length)
     str
   end
   
@@ -86,7 +86,7 @@ module HasHandleFallback
 
     def handle_fallback
       fallback = read_attribute self.class.has_handle_fallback_options[:fallback_column]
-      fallback = fallback.split('@').first if fallback.include? '@'
+      fallback = fallback.split('@').first if fallback.to_s.include? '@'
       HasHandleFallback.str2handle fallback
     end
     
