@@ -1,16 +1,55 @@
 = has_handle_fallback
 
-Description goes here.
+Make it easy to use handles (callsigns/monikers/usernames) in URLs, even if they might be blank.
 
-== Note on Patches/Pull Requests
- 
-* Fork the project.
-* Make your feature addition or bug fix.
-* Add tests for it. This is important so I don't break it in a
-  future version unintentionally.
-* Commit, do not mess with rakefile, version, or history.
-  (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
-* Send me a pull request. Bonus points for topic branches.
+== Quickstart
+
+  class Person < ActiveRecord::Base
+    has_handle_fallback :email
+  end
+
+This assumes that <tt>Person</tt> has the fields <tt>handle</tt> and <tt>email</tt>.
+
+  class PeopleController < ActionController::Base
+    def object
+      @object ||= Person.find_by_id_or_handle(params[:id])
+    end
+  end
+
+Then you can safely use <tt>Person#to_param</tt> in URLs, etc. because, when in doubt, the finder will use the numeric ID.
+
+  Long forms:  Person.find_by_id_or_handle('pierrebourdieu'), Person.find_by_id_or_handle(1)
+  Short forms: Person['pierrebourdieu'], Person[1]
+
+== What's going on?
+
+  def test_only_uses_handle_as_param_when_not_changed_from_value_in_database
+    pierre = Person.new :email => 'pierre.bourdieu@example.com'
+    
+    # not saved, so to_param is just blank
+    assert_equal '', pierre.to_param
+    assert_equal nil, Person[pierre.to_param]
+    
+    # no handle set, so to_param is integer primary key
+    pierre.save!
+    assert_equal pierre.id.to_s, pierre.to_param
+    assert_equal pierre, Person[pierre.to_param]
+    
+    # handle is set, but not saved, so STILL use integer primary key
+    pierre.handle = 'pierrebourdieu'
+    assert_equal pierre.id.to_s, pierre.to_param
+    assert_equal pierre, Person[pierre.to_param]
+    
+    # now handle is saved, so we can use it as the param
+    pierre.save!
+    assert_equal 'pierrebourdieu', pierre.to_param
+    assert_equal pierre, Person[pierre.to_param]
+    
+    # handle was changed, so let's use the integer primary key until it's saved again
+    pierre.handle = ''
+    assert_equal pierre.id.to_s, pierre.to_param
+    assert_equal pierre, Person[pierre.to_param]
+  end
 
 == Copyright
 
