@@ -1,3 +1,5 @@
+require 'validates_decency_of'
+
 module HasHandleFallback
   SUB_REGEXP = '\_\-a-zA-Z0-9'
   REGEXP = /\A[#{SUB_REGEXP}]+\z/
@@ -22,6 +24,7 @@ module HasHandleFallback
         has_handle_fallback_options[:fallback_column] = fallback_column.to_s
         has_handle_fallback_options[:handle_column] = options.delete(:handle_column) || 'handle'
         
+        validates_decency_of has_handle_fallback_options[:fallback_column]
         validate :handle_is_valid
       end
     end
@@ -71,6 +74,10 @@ module HasHandleFallback
       # validates_length_of :handle, :in => HasHandleFallback::LENGTH_RANGE, :allow_nil => true
       unless HasHandleFallback::LENGTH_RANGE.include? raw.length
         errors.add self.class.has_handle_fallback_options[:handle_column], "must be #{HasHandleFallback::LENGTH_RANGE} characters in length"
+      end
+      
+      if ValidatesDecencyOf.indecent? raw
+        errors.add self.class.has_handle_fallback_options[:handle_column], "is indecent"
       end
       
       # validates_uniqueness_of :handle, :case_sensitive => false, :allow_nil => true

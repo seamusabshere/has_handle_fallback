@@ -49,6 +49,10 @@ class TestHasHandleFallback < Test::Unit::TestCase
     assert_equal false, Person.new(:email => 'pierre.bourdieu@example.com', :handle => '          ').valid?
   end
   
+  def test_cannot_have_indecent_handle
+    assert_equal false, Person.new(:email => 'pierre.bourdieu@example.com', :handle => 'scuntshorpe').valid?
+  end
+  
   def test_is_careful_with_things_that_look_like_emails
     assert_equal 'pierrebourdieu', Person.new(:email => 'pierre.bourdieu@example.com').handle
   end
