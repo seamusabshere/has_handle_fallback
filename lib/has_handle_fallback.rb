@@ -74,7 +74,7 @@ module HasHandleFallback
       end
       
       # validates_uniqueness_of :handle, :case_sensitive => false, :allow_nil => true
-      if self.class.exists? [ "LOWER(#{self.class.quoted_table_name}.`#{self.class.has_handle_fallback_options[:handle_column]}`) = ?", raw.downcase ]
+      if self.class.exists? [ "#{self.class.quoted_table_name}.`#{self.class.primary_key}` <> ? AND LOWER(#{self.class.quoted_table_name}.`#{self.class.has_handle_fallback_options[:handle_column]}`) = ?", id, raw.downcase ]
         errors.add self.class.has_handle_fallback_options[:handle_column], "isn't unique"
       end
     end
