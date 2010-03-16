@@ -21,6 +21,7 @@ module HasHandleFallback
       class_eval do
         cattr_accessor :has_handle_fallback_options
         self.has_handle_fallback_options = {}
+        has_handle_fallback_options[:required] = options.delete(:required) || false
         has_handle_fallback_options[:fallback_column] = fallback_column.to_s
         has_handle_fallback_options[:handle_column] = options.delete(:handle_column) || 'handle'
         
@@ -53,8 +54,8 @@ module HasHandleFallback
       end
       
       # allow nils but not blanks
-      if !raw.nil? and raw.blank?
-        errors.add self.class.has_handle_fallback_options[:handle_column], "can't be blank if you're presented the opportunity to set it"
+      if raw.blank? and (!raw.nil? or has_handle_fallback_options[:required])
+        errors.add self.class.has_handle_fallback_options[:handle_column], "can't be blank"
       end
       
       # trapdoor for nil handles

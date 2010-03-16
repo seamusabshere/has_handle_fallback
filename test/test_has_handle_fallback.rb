@@ -17,7 +17,7 @@ class Person < ActiveRecord::Base
 end
 
 class Cat < ActiveRecord::Base
-  has_handle_fallback :name, :handle_column => 'moniker'
+  has_handle_fallback :name, :handle_column => 'moniker', :required => true
 end
 
 class TestHasHandleFallback < Test::Unit::TestCase
@@ -34,6 +34,11 @@ class TestHasHandleFallback < Test::Unit::TestCase
   def test_can_use_alternate_columns
     pierre = Cat.new :name => 'Pierre Bourdieu'
     assert_equal 'PierreBourdieu', pierre.handle
+  end
+  
+  def test_can_in_fact_require_handle
+    pierre = Cat.new :name => 'Pierre Bourdieu'
+    assert_equal false, pierre.valid?
   end
   
   def test_has_validations
