@@ -24,7 +24,6 @@ module HasHandleFallback
         has_handle_fallback_options[:fallback_column] = fallback_column.to_s
         has_handle_fallback_options[:handle_column] = options.delete(:handle_column) || 'handle'
         
-        validates_decency_of has_handle_fallback_options[:fallback_column]
         validate :handle_is_valid
       end
     end
