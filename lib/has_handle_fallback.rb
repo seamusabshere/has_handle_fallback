@@ -9,7 +9,7 @@ module HasHandleFallback
   
   def self.str2handle(str)
     str = str.to_s.gsub ANTI_REGEXP, ''
-    str << ('_' * (LENGTH_RANGE.min - str.length)) unless LENGTH_RANGE.include?(str.length)
+    str << ('_' * (LENGTH_RANGE.min - str.length)) if str.length < LENGTH_RANGE.min
     str
   end
   
