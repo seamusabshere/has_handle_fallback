@@ -21,6 +21,11 @@ class Cat < ActiveRecord::Base
 end
 
 class TestHasHandleFallback < Test::Unit::TestCase
+  def setup
+    Person.delete_all
+    Cat.delete_all
+  end
+  
   def test_has_handle
     ab = Person.new :email => 'a.b@example.com', :handle => 'AB'
     assert_equal 'AB', ab.handle
