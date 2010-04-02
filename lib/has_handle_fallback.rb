@@ -34,7 +34,7 @@ module HasHandleFallback
     def find_by_id_or_handle(param)
       return if param.blank?
       param = param.to_s
-      if param.to_s =~ HasHandleFallback::RECORD_ID_REGEXP
+      if param =~ HasHandleFallback::RECORD_ID_REGEXP
         find_by_id param
       else
         send "find_by_#{has_handle_fallback_options[:handle_column]}", param
