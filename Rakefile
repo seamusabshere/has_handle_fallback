@@ -6,7 +6,7 @@ begin
   Jeweler::Tasks.new do |gem|
     gem.name = "has_handle_fallback"
     gem.summary = %Q{Make it easy to use handles (callsigns/monikers/usernames) in URLs, even if they might be blank.}
-    gem.description = %Q{Make it easy to use handles (callsigns/monikers/usernames) in URLs, even if they might be blank.}
+    gem.description = %Q{Make it easy to use handles (callsigns/monikers/usernames) in URLs, even if they might be blank. Provides sensible validations and a find_by_id_or_handle method.}
     gem.email = "seamus@abshere.net"
     gem.homepage = "http://github.com/seamusabshere/has_handle_fallback"
     gem.authors = ["Seamus Abshere"]
