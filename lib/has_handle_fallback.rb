@@ -37,7 +37,7 @@ module HasHandleFallback
       if param =~ HasHandleFallback::RECORD_ID_REGEXP
         find_by_id param
       else
-        send "find_by_#{has_handle_fallback_options[:handle_column]}", param
+        first :conditions => [ "LOWER(#{quoted_table_name}.`#{has_handle_fallback_options[:handle_column]}`) = ?", param.downcase ]
       end
     end
     alias :[] :find_by_id_or_handle

@@ -51,6 +51,12 @@ class TestHasHandleFallback < Test::Unit::TestCase
     assert_equal false, Person.new(:email => 'pierre.bourdieu@example.com', :handle => 'Pierre:Bourdieu_99').valid?
   end
   
+  def test_validates_uniqueness_ignoring_case
+    Person.create!(:email => 'pierre.bourdieu@example.com', :handle => 'Pierre-Bourdieu_99')
+    b = Person.create(:email => 'pierre.bourdieu@example.com', :handle => 'PIERRE-BOURDIEU_99')
+    assert_equal "isn't unique", b.errors.on(:handle)
+  end
+  
   def test_can_have_nil_handle
     assert_equal true, Person.new(:email => 'pierre.bourdieu@example.com', :handle => nil).valid?
   end
@@ -93,5 +99,11 @@ class TestHasHandleFallback < Test::Unit::TestCase
     pierre.handle = ''
     assert_equal pierre.id.to_s, pierre.to_param
     assert_equal pierre, Person[pierre.to_param]
+  end
+  
+  def test_finds_by_id_or_handle_ignoring_case
+    handle = 'Pierre-Bourdieu_99'
+    a = Person.create!(:email => 'pierre.bourdieu@example.com', :handle => handle.upcase)
+    assert_equal a, Person[handle.downcase]
   end
 end
