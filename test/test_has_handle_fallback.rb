@@ -38,7 +38,7 @@ class TestHasHandleFallback < Test::Unit::TestCase
   
   def test_can_use_alternate_columns
     pierre = Cat.new :name => 'Pierre Bourdieu'
-    assert_equal 'PierreBourdieu', pierre.handle
+    assert_equal 'pierre_bourdieu', pierre.handle
   end
   
   def test_can_in_fact_require_handle

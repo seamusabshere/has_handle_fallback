@@ -11,9 +11,11 @@ module HasHandleFallback
   RECORD_ID_REGEXP = /\A\d+\z/
   
   def self.str2handle(str)
-    str = str.to_s.gsub ANTI_REGEXP, ''
+    str = str.to_s.dup
+    str.gsub! ANTI_REGEXP, ''
+    str = str.underscore
     str << ('_' * (LENGTH_RANGE.min - str.length)) if str.length < LENGTH_RANGE.min
-    str
+    str[0, LENGTH_RANGE.max]
   end
   
   module ActiveRecordBaseMethods
