@@ -1,3 +1,6 @@
+require 'active_support'
+begin; require 'active_support/core_ext/string/inflections'; rescue MissingSourceFile; end
+require 'active_record'
 require 'validates_decency_of'
 
 module HasHandleFallback

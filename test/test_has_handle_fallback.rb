@@ -54,7 +54,11 @@ class TestHasHandleFallback < Test::Unit::TestCase
   def test_validates_uniqueness_ignoring_case
     Person.create!(:email => 'pierre.bourdieu@example.com', :handle => 'Pierre-Bourdieu_99')
     b = Person.create(:email => 'pierre.bourdieu@example.com', :handle => 'PIERRE-BOURDIEU_99')
-    assert_equal "isn't unique", b.errors.on(:handle)
+    if ActiveRecord::VERSION::MAJOR == 2
+      assert_equal "isn't unique", b.errors.on(:handle)
+    else
+      assert_equal "isn't unique", b.errors[:handle].first
+    end
   end
   
   def test_can_have_nil_handle
