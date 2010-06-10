@@ -47,7 +47,7 @@ module HasHandleFallback
       if param =~ HasHandleFallback::RECORD_ID_REGEXP
         find_by_id param
       else
-        first :conditions => [ "LOWER(#{quoted_table_name}.`#{has_handle_fallback_options[:handle_column]}`) = ?", param.downcase ]
+        first :conditions => [ "#{quoted_table_name}.`#{has_handle_fallback_options[:handle_column]}` LIKE ?", param ]
       end
     end
     alias :[] :find_by_id_or_handle
@@ -91,11 +91,11 @@ module HasHandleFallback
       end
       
       # validates_uniqueness_of :handle, :case_sensitive => false, :allow_nil => true
-      if new_record? and self.class.exists? [ "LOWER(#{self.class.quoted_table_name}.`#{self.class.has_handle_fallback_options[:handle_column]}`) = ?", raw.downcase ]
+      if new_record? and self.class.exists? [ "#{self.class.quoted_table_name}.`#{self.class.has_handle_fallback_options[:handle_column]}` LIKE ?", raw ]
         errors.add self.class.has_handle_fallback_options[:handle_column], "isn't unique"
       end
       
-      if !new_record? and self.class.exists? [ "#{self.class.quoted_table_name}.`#{self.class.primary_key}` <> ? AND LOWER(#{self.class.quoted_table_name}.`#{self.class.has_handle_fallback_options[:handle_column]}`) = ?", id, raw.downcase ]
+      if !new_record? and self.class.exists? [ "#{self.class.quoted_table_name}.`#{self.class.primary_key}` <> ? AND #{self.class.quoted_table_name}.`#{self.class.has_handle_fallback_options[:handle_column]}` LIKE ?", id, raw ]
         errors.add self.class.has_handle_fallback_options[:handle_column], "isn't unique"
       end
     end
