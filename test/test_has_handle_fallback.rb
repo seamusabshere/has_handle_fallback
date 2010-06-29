@@ -10,6 +10,11 @@ ActiveRecord::Schema.define(:version => 20090819143429) do
     t.string :name
     t.string :moniker
   end
+
+  create_table 'dogs', :force => true do |t|
+    t.string :email
+    t.string :handle
+  end
 end
 
 class Person < ActiveRecord::Base
@@ -18,6 +23,11 @@ end
 
 class Cat < ActiveRecord::Base
   has_handle_fallback :name, :handle_column => 'moniker', :required => true
+end
+
+class Dog < ActiveRecord::Base
+  has_handle_fallback :handle, :validates_format => false
+  validates_format_of :handle, :with => /Astro/
 end
 
 class TestHasHandleFallback < Test::Unit::TestCase
@@ -109,5 +119,13 @@ class TestHasHandleFallback < Test::Unit::TestCase
     handle = 'Pierre-Bourdieu_99'
     a = Person.create!(:email => 'pierre.bourdieu@example.com', :handle => handle.upcase)
     assert_equal a, Person[handle.downcase]
+  end
+
+  def test_disables_validation_with_option
+    d = Dog.new :handle => 'Astro Jetson'
+    assert d.valid?
+
+    d = Dog.new :handle => 'Scooby Doo'
+    assert !d.valid?
   end
 end

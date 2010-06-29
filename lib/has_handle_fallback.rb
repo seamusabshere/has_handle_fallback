@@ -34,6 +34,8 @@ module HasHandleFallback
         has_handle_fallback_options[:required] = options.delete(:required) || false
         has_handle_fallback_options[:fallback_column] = fallback_column.to_s
         has_handle_fallback_options[:handle_column] = options.delete(:handle_column) || 'handle'
+        has_handle_fallback_options[:validates_format] = 
+          options.include?(:validates_format) ? options.delete(:validates_format) : true
         
         validate :handle_is_valid
       end
@@ -77,7 +79,7 @@ module HasHandleFallback
       end
       
       # validates_format_of :handle, :with => HasHandleFallback::REGEXP, :allow_nil => true
-      unless raw =~ HasHandleFallback::REGEXP
+      if has_handle_fallback_options[:validates_format] and raw !~ HasHandleFallback::REGEXP
         errors.add self.class.has_handle_fallback_options[:handle_column], "contains invalid characters"
       end
       
