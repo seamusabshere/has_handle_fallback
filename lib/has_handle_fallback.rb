@@ -24,15 +24,18 @@ module HasHandleFallback
   end
   
   module ActiveRecordBaseMethods
-    def has_handle_fallback(fallback_column, options = {})
+    def has_handle_fallback(*args)
       include InstanceMethods
       extend ClassMethods
+
+      fallback_column = args.first.respond_to?(:[]) ? nil : args.shift.to_s
+      options = args.shift || {}
       
       class_eval do
         cattr_accessor :has_handle_fallback_options
         self.has_handle_fallback_options = {}
         has_handle_fallback_options[:required] = options.delete(:required) || false
-        has_handle_fallback_options[:fallback_column] = fallback_column.to_s
+        has_handle_fallback_options[:fallback_column] = fallback_column
         has_handle_fallback_options[:handle_column] = options.delete(:handle_column) || 'handle'
         has_handle_fallback_options[:validates_format] = 
           options.include?(:validates_format) ? options.delete(:validates_format) : true
@@ -108,9 +111,12 @@ module HasHandleFallback
     end
 
     def handle_fallback
-      fallback = read_attribute self.class.has_handle_fallback_options[:fallback_column]
-      fallback = fallback.split('@').first if fallback.to_s.include? '@'
-      HasHandleFallback.str2handle fallback
+      column = self.class.has_handle_fallback_options[:fallback_column]
+      if column
+        fallback = read_attribute column
+        fallback = fallback.split('@').first if fallback.to_s.include? '@'
+        HasHandleFallback.str2handle fallback
+      end
     end
     
     def to_param

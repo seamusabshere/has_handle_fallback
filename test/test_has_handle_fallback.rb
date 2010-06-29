@@ -15,6 +15,11 @@ ActiveRecord::Schema.define(:version => 20090819143429) do
     t.string :email
     t.string :handle
   end
+  
+  create_table 'ferrets', :force => true do |t|
+    t.string :email
+    t.string :handle
+  end
 end
 
 class Person < ActiveRecord::Base
@@ -26,8 +31,12 @@ class Cat < ActiveRecord::Base
 end
 
 class Dog < ActiveRecord::Base
-  has_handle_fallback :handle, :validates_format => false
+  has_handle_fallback :email, :validates_format => false
   validates_format_of :handle, :with => /Astro/
+end
+
+class Ferret < ActiveRecord::Base
+  has_handle_fallback :validates_format => false
 end
 
 class TestHasHandleFallback < Test::Unit::TestCase
@@ -127,5 +136,10 @@ class TestHasHandleFallback < Test::Unit::TestCase
 
     d = Dog.new :handle => 'Scooby Doo'
     assert !d.valid?
+  end
+
+  def test_no_fallback_column
+    friedrich = Ferret.new :handle => nil, :email => 'friedrich@example.com'
+    assert_nil friedrich.handle
   end
 end
