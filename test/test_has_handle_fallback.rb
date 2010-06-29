@@ -64,6 +64,11 @@ class TestHasHandleFallback < Test::Unit::TestCase
     pierre = Cat.new :name => 'Pierre Bourdieu'
     assert_equal false, pierre.valid?
   end
+
+  def test_nil_handle_and_email
+    abe = Person.new :email => nil, :handle => nil
+    assert_nil abe.handle
+  end
   
   def test_has_validations
     assert_equal true, Person.new(:email => 'pierre.bourdieu@example.com', :handle => 'Pierre-Bourdieu_99').valid?

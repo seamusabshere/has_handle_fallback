@@ -59,12 +59,21 @@ module HasHandleFallback
   end
 
   module InstanceMethods
+    def fallback_handle_is_valid?
+      fallback_column = self.class.has_handle_fallback_options[:fallback_column]
+      # only check if we need to actually generate a fallback
+      if handle.blank? and fallback_column.present?
+        handle_fallback =~ HasHandleFallback::REGEXP and HasHandleFallback::LENGTH_RANGE.include?(handle_fallback.length)
+      else
+        true
+      end
+    end
+
     def handle_is_valid
       raw = read_attribute self.class.has_handle_fallback_options[:handle_column]
-      cooked = handle_fallback
 
       # inline check to make sure the handle_fallback method works
-      unless cooked =~ HasHandleFallback::REGEXP and HasHandleFallback::LENGTH_RANGE.include?(cooked.length)
+      unless fallback_handle_is_valid?
         raise "Dear Developer: your handle_fallback method is not generating valid handles (generated '#{handle_fallback}' for '#{raw}')"
       end
       
@@ -112,8 +121,7 @@ module HasHandleFallback
 
     def handle_fallback
       column = self.class.has_handle_fallback_options[:fallback_column]
-      if column
-        fallback = read_attribute column
+      if column and fallback = read_attribute(column)
         fallback = fallback.split('@').first if fallback.to_s.include? '@'
         HasHandleFallback.str2handle fallback
       end
