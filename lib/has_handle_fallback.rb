@@ -24,13 +24,10 @@ module HasHandleFallback
   end
   
   module ActiveRecordBaseMethods
-    def has_handle_fallback(*args)
+    def has_handle_fallback(fallback_column, options = {})
       include InstanceMethods
       extend ClassMethods
 
-      fallback_column = args.first.respond_to?(:[]) ? nil : args.shift.to_s
-      options = args.shift || {}
-      
       class_eval do
         cattr_accessor :has_handle_fallback_options
         self.has_handle_fallback_options = {}
@@ -59,23 +56,8 @@ module HasHandleFallback
   end
 
   module InstanceMethods
-    def fallback_handle_is_valid?
-      fallback_column = self.class.has_handle_fallback_options[:fallback_column]
-      # only check if we need to actually generate a fallback
-      if handle.blank? and fallback_column.present?
-        handle_fallback =~ HasHandleFallback::REGEXP and HasHandleFallback::LENGTH_RANGE.include?(handle_fallback.length)
-      else
-        true
-      end
-    end
-
     def handle_is_valid
       raw = read_attribute self.class.has_handle_fallback_options[:handle_column]
-
-      # inline check to make sure the handle_fallback method works
-      unless fallback_handle_is_valid?
-        raise "Dear Developer: your handle_fallback method is not generating valid handles (generated '#{handle_fallback}' for '#{raw}')"
-      end
       
       # allow nils but not blanks
       if raw.blank? and (!raw.nil? or has_handle_fallback_options[:required])
